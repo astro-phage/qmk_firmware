@@ -1,36 +1,113 @@
-# Quantum Mechanical Keyboard Firmware
+# Custom Keychron Q5 Max Firmware (ANSI Encoder)
 
-[![Current Version](https://img.shields.io/github/tag/qmk/qmk_firmware.svg)](https://github.com/qmk/qmk_firmware/tags)
-[![Discord](https://img.shields.io/discord/440868230475677696.svg)](https://discord.gg/Uq7gcHh)
-[![Docs Status](https://img.shields.io/badge/docs-ready-orange.svg)](https://docs.qmk.fm)
-[![GitHub contributors](https://img.shields.io/github/contributors/qmk/qmk_firmware.svg)](https://github.com/qmk/qmk_firmware/pulse/monthly)
-[![GitHub forks](https://img.shields.io/github/forks/qmk/qmk_firmware.svg?style=social&label=Fork)](https://github.com/qmk/qmk_firmware/)
+## ✨ Features & Changes
 
-This is a keyboard firmware based on the [tmk\_keyboard firmware](https://github.com/tmk/tmk_keyboard) with some useful features for Atmel AVR and ARM controllers, and more specifically, the [OLKB product line](https://olkb.com), the [ErgoDox EZ](https://ergodox-ez.com) keyboard, and the Clueboard product line.
+### 1. The "Control Switch" (Caps Lock) Layer
 
-## Documentation
+The physical Caps Lock key has been repurposed into a Momentary Layer Toggle (`MO(WIN_CTRL)`). Holding Caps Lock activates a custom layer with the following features:
 
-* [See the official documentation on docs.qmk.fm](https://docs.qmk.fm)
+- **Umlauts (Swiss Style):**
+    - `Caps Lock` + `[` = **ü** (or **Ü** if holding Shift)
+    - `Caps Lock` + `;` = **ö** (or **Ö** if holding Shift)
+    - `Caps Lock` + `'` = **ä** (or **Ä** if holding Shift)
 
-The docs are powered by [Docsify](https://docsify.js.org/) and hosted on [GitHub](/docs/). They are also viewable offline; see [Previewing the Documentation](https://docs.qmk.fm/#/contributing?id=previewing-the-documentation) for more details.
+- **Media Knob:** Turning the encoder wheel while holding Caps Lock skips to the Previous/Next track.
+- **Sleep:** Pressing the 2nd key to the left of the knob puts the computer to sleep.
 
-You can request changes by making a fork and opening a [pull request](https://github.com/qmk/qmk_firmware/pulls), or by clicking the "Edit this page" link at the bottom of any page.
+---
 
-## Supported Keyboards
+### 2. Standard Layer Tweaks
 
-* [Planck](/keyboards/planck/)
-* [Preonic](/keyboards/preonic/)
-* [ErgoDox EZ](/keyboards/ergodox_ez/)
-* [Clueboard](/keyboards/clueboard/)
-* [Cluepad](/keyboards/clueboard/17/)
-* [Atreus](/keyboards/atreus/)
+- **Calculator:** The 3rd key to the left of the knob opens the Calculator on Windows.
+- **Volume Knob:** The encoder wheel handles volume up/down by default.
+- **Play/Pause:** Pressing the encoder knob plays or pauses media.
+- **Num Pad:** Press **Fn + ESC (Num PAD key)** to toggle Num Pad on and off.
 
-The project also includes community support for [lots of other keyboards](/keyboards/).
+---
 
-## Maintainers
+### 3. Escape Hatch: Real Caps Lock
 
-QMK is developed and maintained by Jack Humbert of OLKB with contributions from the community, and of course, [Hasu](https://github.com/tmk). The OLKB product firmwares are maintained by [Jack Humbert](https://github.com/jackhumbert), the Ergodox EZ by [ZSA Technology Labs](https://github.com/zsa), the Clueboard by [Zach White](https://github.com/skullydazed), and the Atreus by [Phil Hagelberg](https://github.com/technomancy).
+Because Caps Lock is now a layer modifier, standard Caps Lock functionality was moved to the `WIN_FN` layer.
 
-## Official Website
+- Press **Fn + Caps Lock** to toggle standard ALL CAPS on and off.
 
-[qmk.fm](https://qmk.fm) is the official website of QMK, where you can find links to this page, the documentation, and the keyboards supported by QMK.
+---
+
+## 🛠 Prerequisites (Windows Setup)
+
+To compile and flash this firmware on Windows, you need the QMK CLI toolchain installed.
+
+1. Download and install **QMK MSYS** from the official GitHub releases:
+   https://github.com/qmk/qmk_distro_msys/releases
+
+2. Open the QMK MSYS terminal.
+
+3. Run the setup command to pull down the required compilers:
+
+Navigate to your firmware folder (for example):
+
+```bash
+cd /c/Repos/qmk_firmware
+```
+
+Ensure submodules are up to date (fixes the ChibiOS "No such file or directory" error):
+
+```bash
+make git-submodule
+```
+
+---
+
+## 🚀 Building & Flashing the Keyboard
+
+1. Open your QMK MSYS terminal and navigate to your `qmk_firmware` directory.
+
+2. Run the flash command:
+
+```bash
+qmk flash -kb keychron/q5_max/ansi_encoder -km via
+```
+
+The terminal will compile the code and eventually pause, waiting for a bootloader.
+
+### Put the keyboard into DFU/Flash mode:
+
+1. Unplug the USB cable.
+2. Press and hold the **Esc** key.
+3. Plug the USB cable back in while still holding Esc.
+4. Release the Esc key after 1–2 seconds.
+
+The terminal will automatically detect the keyboard, erase the old firmware, and install this custom build.  
+**Do not unplug the keyboard during this process.**
+
+Wait for the keyboard to restart and the RGB lights to turn back on.
+
+---
+
+## 📁 File Structure & Modifications
+
+If you need to edit this layout later, the modified files are located in:
+
+```
+keyboards/keychron/q5_max/ansi_encoder/keymaps/via/
+```
+
+### Modified Files
+
+- **keymap.c**  
+  Contains the layer arrays, custom C logic for the Umlaut macros, and the updated encoder press for play/pause.
+
+- **rules.mk**  
+  Enabled:
+    - `VIA_ENABLE`
+    - `ENCODER_ENABLE`
+    - `ENCODER_MAP_ENABLE`
+
+- **config.h**  
+  Custom file created specifically to:
+
+```c
+#define DYNAMIC_KEYMAP_LAYER_COUNT 5
+```
+
+This allows the firmware to use the additional `WIN_CTRL` layer.
